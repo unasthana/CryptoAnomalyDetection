@@ -1,5 +1,5 @@
 # Crypto Pump and Dump Detection Using Deep Learning Techniques
-## Code Structure:
+## Code Structure
 ```
 ├── ...
 ├── data
