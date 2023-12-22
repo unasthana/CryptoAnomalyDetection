@@ -1,6 +1,6 @@
 # Crypto Pump and Dump Detection Using Deep Learning Techniques
 ## Code Structure:
-
+'''
 ├── ...
 ├── data
 │ ├── data.py (Dataset Handling Script)
@@ -16,4 +16,4 @@
 |
 |
 |── PumpAndDumpDetection.ipynb (Pump And Dump Detection Notebook)
-
+'''
