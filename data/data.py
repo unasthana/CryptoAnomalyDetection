@@ -1,8 +1,16 @@
-import os
+"""
+Module to process and load time series data for anomaly detection.
 
+This module includes functions for loading data, processing time series into segments,
+and creating data loaders for training and testing machine learning models.
+
+"""
+
+import os
 import numpy as np
 import pandas as pd
 import torch
+
 from sklearn.model_selection import train_test_split, KFold
 from torch.utils.data import DataLoader
 
@@ -25,12 +33,32 @@ FEATURE_NAMES = [
     'delta_minutes',
 ]
 
-
 def load_data(path):
+        """
+    Load time series data from a CSV file.
+
+    Parameters:
+    - path (str): Path to the CSV file.
+
+    Returns:
+    - pd.DataFrame: Loaded data.
+    """
+    
     return pd.read_csv(path, compression='gzip', parse_dates=['date'])
 
 
 def get_pumps(data, segment_length, *, pad=True):
+        """
+    Extract pump segments from the input data.
+
+    Parameters:
+    - data (pd.DataFrame): Input data.
+    - segment_length (int): Length of each segment.
+    - pad (bool): Whether to pad segments to a specified length.
+
+    Returns:
+    - list: List of pump segments.
+    """
 
     pumps = []
     skipped_row_count = 0
@@ -64,6 +92,17 @@ def get_pumps(data, segment_length, *, pad=True):
 
 
 def process_data(data, *, segment_length=60, remove_post_anomaly_data=False):
+       """
+    Process the input data into segments for training machine learning models.
+
+    Parameters:
+    - data (pd.DataFrame): Input data.
+    - segment_length (int): Length of each segment.
+    - remove_post_anomaly_data (bool): Whether to remove segments with post-anomaly data.
+
+    Returns:
+    - np.ndarray: Processed data in segment form.
+    """
 
     print('Processing data...')
     print(f'Segment length: {segment_length}')
@@ -96,6 +135,16 @@ def process_data(data, *, segment_length=60, remove_post_anomaly_data=False):
 
 
 def undersample_train_data(train_data, undersample_ratio):
+        """
+    Undersample the training data to balance the class distribution.
+
+    Parameters:
+    - train_data (np.ndarray): Training data.
+    - undersample_ratio (float): Ratio of undersampling.
+
+    Returns:
+    - np.ndarray: Undersampled training data.
+    """
 
     with_anomalies = train_data[:, :, -1].sum(axis=1) > 0
     mask = with_anomalies | (np.random.rand(train_data.shape[0]) < undersample_ratio)
@@ -110,6 +159,21 @@ def get_data(path, *,
              segment_length,
              save=False,
              return_loaders=False):
+    """
+    Load and process data, and optionally create data loaders.
+
+    Parameters:
+    - path (str): Path to the data file.
+    - train_ratio (float): Ratio of data used for training.
+    - batch_size (int): Batch size for data loaders.
+    - undersample_ratio (float): Ratio for undersampling.
+    - segment_length (int): Length of each segment.
+    - save (bool): Whether to save processed data.
+    - return_loaders (bool): Whether to return data loaders.
+
+    Returns:
+    - np.ndarray or tuple: Processed data or data loaders.
+    """
 
     assert os.path.exists(path)
 
@@ -136,6 +200,18 @@ def get_data(path, *,
 
 
 def create_loaders(data, *, train_ratio, batch_size, undersample_ratio):
+       """
+    Create data loaders for training and testing.
+
+    Parameters:
+    - data (np.ndarray): Processed data.
+    - train_ratio (float): Ratio of data used for training.
+    - batch_size (int): Batch size for data loaders.
+    - undersample_ratio (float): Ratio for undersampling.
+
+    Returns:
+    - tuple: Train and test data loaders.
+    """
 
     train_data, test_data = train_test_split(data, train_size=train_ratio, shuffle=False)
 
@@ -155,6 +231,21 @@ def create_loaders(data, *, train_ratio, batch_size, undersample_ratio):
 
 
 def create_loader(data, *, batch_size, undersample_ratio=1.0, shuffle=False, drop_last=True, generator=None, verbose=False):
+        """
+    Create a data loader from the input data.
+
+    Parameters:
+    - data (np.ndarray): Input data.
+    - batch_size (int): Batch size for the data loader.
+    - undersample_ratio (float): Ratio for undersampling.
+    - shuffle (bool): Whether to shuffle the data.
+    - drop_last (bool): Whether to drop the last batch if it is incomplete.
+    - generator (torch.Generator): Generator for reproducibility.
+    - verbose (bool): Whether to print verbose information.
+
+    Returns:
+    - DataLoader: PyTorch DataLoader object.
+    """
 
     if 0 < undersample_ratio and undersample_ratio < 1:
 
