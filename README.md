@@ -9,6 +9,11 @@ that deep learning outperforms existing methods. This underscores the necessity
 for sophisticated approaches to combat fraud in the dynamic cryptocurrency
 landscape.
 
+Results:
+
+![image](https://github.com/user-attachments/assets/a29a7f3b-5f63-49a0-9fd4-573ea72e3ad6)
+
+
 ## Code Structure
 ```
 ├── ...
